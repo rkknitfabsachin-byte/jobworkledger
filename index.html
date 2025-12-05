@@ -77,8 +77,35 @@
 <script>
 const API = "https://job-workrk.rkknitfabsachin.workers.dev";
 
+async function loadDropdowns();
+
 async function loadDropdowns() {
-  const p = await fetch(`${API}?action=parties`).then(r=>r.json());
+  try {
+    const pRes = await fetch(`${API}?action=parties`);
+    const p = await pRes.json();
+
+    const yRes = await fetch(`${API}?action=yarns`);
+    const y = await yRes.json();
+
+    // Debug: if API error
+    if (!p.parties) {
+      console.log('Party API Error:', p);
+      alert('Error loading parties');
+      return;
+    }
+
+    let pSel = document.getElementById('party');
+    pSel.innerHTML = `<option value="">-- Select Party --</option>` +
+      p.parties.map(a=>`<option value="${a}">${a}</option>`).join("");
+
+    let ySel = document.getElementById('yarn');
+    ySel.innerHTML = `<option value="">-- All Yarns --</option>` +
+      y.yarns.map(a=>`<option value="${a}">${a}</option>`).join("");
+  } catch (e) {
+    console.log('Dropdown Load Error:', e);
+    alert('Network error loading dropdowns');
+  }
+}?action=parties`).then(r=>r.json());
   const y = await fetch(`${API}?action=yarns`).then(r=>r.json());
 
   let pSel = document.getElementById('party');
