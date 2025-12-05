@@ -1,172 +1,209 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<title>RK KNIT FAB — Job Work Ledger</title>
-
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RK Knit Fab — Yarn Stock Ledger</title>
 <style>
-body {
-  margin: 0;
-  font-family: Poppins, sans-serif;
-  background: #0f1115;
-  color: white;
-}
-
-.app {
-  padding: 20px;
-}
-
-h1 {
-  font-size: 26px;
-  font-weight: 600;
-  text-align: center;
-  margin-top: 10px;
-}
-
-.card {
-  background: rgba(255,255,255,0.08);
-  padding: 18px;
-  margin: 15px 0;
-  border-radius: 14px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 0 25px rgba(0,0,0,0.4);
-  animation: fadeIn .5s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px);}
-  to   { opacity: 1; transform: translateY(0);}
-}
-
-select {
-  width: 100%;
-  padding: 14px;
-  border-radius: 10px;
-  border: none;
-  font-size: 16px;
-  margin-top: 8px;
-  background: rgba(255,255,255,0.2);
-  color: white;
-}
-
-option {
-  color: #000;
-}
-
-.table-container {
-  margin-top: 25px;
-  overflow-x: auto;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
-}
-
-th, td {
-  padding: 10px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-}
-
-th {
-  background: rgba(255,255,255,0.15);
-}
-
-.rk {
-  text-align: center;
-  margin-top: 10px;
-  color: #00eaff;
-  text-shadow: 0 0 8px #00eaff;
-  font-weight: 600;
-}
+  :root{
+    --bg:#0d0f16; --card:#151925; --text:#e8eefc; --muted:#9aa7c7; --accent:#42a5ff; --accent2:#00ffd5; --danger:#ff6b6b; --ok:#7dff8c; --line:rgba(255,255,255,.08);
+  }
+  [data-theme="light"]{
+    --bg:#f5f7fb; --card:#ffffff; --text:#121625; --muted:#55607a; --accent:#2b6bff; --accent2:#06b6d4; --danger:#d6336c; --ok:#2e7d32; --line:rgba(0,0,0,.08);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text)}
+  .container{max-width:1100px;margin:auto;padding:20px}
+  .brand{display:flex;align-items:center;justify-content:center;gap:10px;margin:6px 0 14px}
+  .brand .logo{width:10px;height:10px;border-radius:50%;box-shadow:0 0 20px var(--accent2),0 0 40px var(--accent2)}
+  .brand h1{margin:0;font-size:clamp(20px,4vw,28px);letter-spacing:.5px;text-shadow:0 0 10px rgba(0,255,213,.35)}
+  .toolbar{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:720px){.toolbar{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;backdrop-filter:blur(10px);box-shadow:0 10px 30px rgba(0,0,0,.18)}
+  label{font-size:12px;color:var(--muted);display:block;margin-bottom:6px}
+  select,input[type=date]{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:transparent;color:var(--text)}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+  button{border:none;border-radius:12px;padding:12px 16px;font-weight:600;cursor:pointer}
+  .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#001018}
+  .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--text)}
+  .switch{margin-left:auto}
+  .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}
+  @media(max-width:900px){.summary{grid-template-columns:repeat(2,1fr)}}
+  .kpi{padding:14px;border-radius:14px;background:var(--card);border:1px solid var(--line)}
+  .kpi h3{margin:0 0 6px;font-size:12px;color:var(--muted)}
+  .kpi .val{font-size:20px;font-weight:800}
+  .kpi.in{box-shadow:inset 0 0 0 1px rgba(66,165,255,.2)}
+  .kpi.out{box-shadow:inset 0 0 0 1px rgba(255,107,107,.2)}
+  .kpi.ret{box-shadow:inset 0 0 0 1px rgba(0,255,213,.2)}
+  .kpi.bal{box-shadow:inset 0 0 0 1px rgba(125,255,140,.2)}
+  .tablewrap{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:left}
+  th{font-size:12px;color:var(--muted);background:linear-gradient(180deg,rgba(255,255,255,.04),transparent)}
+  tr:hover td{background:linear-gradient(90deg,rgba(66,165,255,.06),transparent)}
+  .qty-pos{color:var(--ok);font-weight:700}
+  .qty-neg{color:var(--danger);font-weight:700}
+  .muted{color:var(--muted)}
+  .footer{opacity:.7;text-align:center;margin:20px 0;font-size:12px}
+  /* Modal */
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;padding:20px}
+  .modal .panel{max-width:520px;width:100%;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
 </style>
 </head>
-
 <body>
+  <div class="container">
+    <div class="brand">
+      <span class="logo"></span>
+      <h1>RK KNIT FAB — Yarn Ledger</h1>
+      <button id="themeBtn" class="btn-ghost switch">🌙</button>
+    </div>
 
-<div class="app">
-  <h1>Job Work Ledger</h1>
-  <div class="rk">RK KNIT FAB</div>
+    <div class="toolbar">
+      <div class="card">
+        <label>Party</label>
+        <select id="party"></select>
+      </div>
+      <div class="card">
+        <label>Yarn</label>
+        <select id="yarn"></select>
+      </div>
+      <div class="card">
+        <label>From</label>
+        <input type="date" id="from" />
+      </div>
+      <div class="card">
+        <label>To</label>
+        <input type="date" id="to" />
+      </div>
+    </div>
 
-  <div class="card">
-    <label>Choose Party</label>
-    <select id="partySelect"><option>Loading...</option></select>
+    <div class="actions">
+      <button class="btn-primary" id="loadBtn">Load Ledger</button>
+      <button class="btn-ghost" id="resetBtn">Reset</button>
+      <button class="btn-ghost" id="adjustBtn">Add Adjustment</button>
+      <span class="muted" id="sinceTag"></span>
+    </div>
 
-    <label style="margin-top:15px;">Choose Yarn</label>
-    <select id="yarnSelect"><option>Loading...</option></select>
+    <div class="summary">
+      <div class="kpi in"><h3>Incoming</h3><div class="val" id="kIn">0</div></div>
+      <div class="kpi out"><h3>Outgoing</h3><div class="val" id="kOut">0</div></div>
+      <div class="kpi ret"><h3>Return</h3><div class="val" id="kRet">0</div></div>
+      <div class="kpi bal"><h3>Balance</h3><div class="val" id="kBal">0</div></div>
+    </div>
+
+    <div class="tablewrap">
+      <table id="tbl">
+        <thead>
+          <tr><th>Date</th><th>Party</th><th>Yarn</th><th>Qty</th><th>Type</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="footer muted">Made with ❤ for RK KNIT FAB</div>
   </div>
 
-  <div class="table-container" id="tableArea"></div>
-</div>
+  <!-- Adjustment Modal -->
+  <div class="modal" id="modal">
+    <div class="panel">
+      <h3 style="margin:0 0 10px">Add Stock Adjustment</h3>
+      <div class="toolbar" style="grid-template-columns:1fr 1fr;gap:10px">
+        <div class="card"><label>Date</label><input type="date" id="adjDate"></div>
+        <div class="card"><label>Qty (+/-)</label><input type="number" id="adjQty" step="0.01"></div>
+        <div class="card"><label>Party</label><select id="adjParty"></select></div>
+        <div class="card"><label>Yarn</label><select id="adjYarn"></select></div>
+      </div>
+      <div class="actions">
+        <button class="btn-primary" id="saveAdj">Save</button>
+        <button class="btn-ghost" id="closeAdj">Close</button>
+        <span class="muted" id="adjNote">This writes to STOCK_ADJUST (backend must allow).</span>
+      </div>
+    </div>
+  </div>
 
 <script>
-const API = "https://job-workrk.rkknitfabsachin.workers.dev/?action=";
+const API = "https://job-workrk.rkknitfabsachin.workers.dev"; // Cloudflare Worker base
 
-async function loadDropdowns() {
-  const parties = await fetch(API + "parties").then(r=>r.json());
-  const yarns = await fetch(API + "yarns").then(r=>r.json());
+// THEME
+const themeBtn = document.getElementById('themeBtn');
+const setTheme = t=>{document.documentElement.setAttribute('data-theme',t);localStorage.setItem('rk-theme',t);themeBtn.textContent=t==='light'? '🌞':'🌙'}
+setTheme(localStorage.getItem('rk-theme')||'dark');
+themeBtn.onclick=()=>setTheme(document.documentElement.getAttribute('data-theme')==='light'?'dark':'light');
 
-  fillSelect("partySelect", parties.parties);
-  fillSelect("yarnSelect", yarns.yarns);
+// Helpers
+const qs = id => document.getElementById(id);
+const fmt = n => Number(n||0).toLocaleString(undefined,{maximumFractionDigits:2});
+const fetchJSON = async (url,opts) => {
+  const r = await fetch(url,opts); const t = await r.text();
+  try { return JSON.parse(t);} catch(e){ console.error('Bad JSON:', t); throw e; }
+};
+
+async function loadDropdowns(){
+  const p = await fetchJSON(`${API}?action=parties`);
+  const y = await fetchJSON(`${API}?action=yarns`);
+  const parties = Array.isArray(p)? p : (p.parties||[]);
+  const yarns   = Array.isArray(y)? y : (y.yarns||[]);
+  qs('party').innerHTML = '<option value="">-- Select Party --</option>' + parties.map(v=>`<option>${v}</option>`).join('');
+  qs('yarn').innerHTML  = '<option value="">-- All Yarns --</option>'    + yarns.map(v=>`<option>${v}</option>`).join('');
+  // modal selects mirror
+  qs('adjParty').innerHTML = qs('party').innerHTML;
+  qs('adjYarn').innerHTML  = qs('yarn').innerHTML;
 }
 
-function fillSelect(id, arr) {
-  const sel = document.getElementById(id);
-  sel.innerHTML = `<option value="">-- Select --</option>`;
-  arr.forEach(v => sel.innerHTML += `<option>${v}</option>`);
+async function loadLedger(){
+  const party = qs('party').value; if(!party){ alert('Select a party'); return; }
+  const yarn  = qs('yarn').value;  const from = qs('from').value; const to = qs('to').value;
+  let url = `${API}?action=ledger&party=${encodeURIComponent(party)}`;
+  if(yarn) url += `&yarn=${encodeURIComponent(yarn)}`;
+  if(from) url += `&from=${from}`;
+  if(to)   url += `&to=${to}`;
+  const rows = await fetchJSON(url);
+  render(rows);
 }
 
-async function loadLedger() {
-  const res = await fetch(API + "ledger").then(r=>r.json());
-  return res.ledger;
+function render(rows){
+  // KPIs
+  let inc=0,out=0,ret=0,adj=0;
+  rows.forEach(r=>{ if(r.type==='Incoming') inc += r.qty; else if(r.type==='Outgoing') out += Math.abs(r.qty); else if(r.type==='Return') ret += r.qty; else if(r.type==='Adjust') adj += r.qty; });
+  const bal = inc - out + ret + adj;
+  qs('kIn').textContent = fmt(inc);
+  qs('kOut').textContent= fmt(out);
+  qs('kRet').textContent= fmt(ret+adj); // show returns+adjust together in green metric
+  qs('kBal').textContent= fmt(bal);
+
+  // Table
+  const tb = qs('tbl').querySelector('tbody');
+  tb.innerHTML = rows.map(r=>{
+    const cls = r.qty>=0 ? 'qty-pos' : 'qty-neg';
+    return `<tr>
+      <td>${r.date||''}</td>
+      <td>${r.party||''}</td>
+      <td>${r.yarn||''}</td>
+      <td class="${cls}">${fmt(r.qty)}</td>
+      <td>${r.type}</td>
+    </tr>`;
+  }).join('');
 }
 
-async function refreshTable() {
-  const party = document.getElementById("partySelect").value;
-  const yarn  = document.getElementById("yarnSelect").value;
+// Adjustment modal
+const modal = qs('modal');
+qs('adjustBtn').onclick=()=>{ modal.style.display='flex'; qs('adjParty').value=qs('party').value; qs('adjYarn').value=qs('yarn').value; qs('adjDate').valueAsDate = new Date(); };
+qs('closeAdj').onclick=()=> modal.style.display='none';
+qs('saveAdj').onclick=async()=>{
+  const body = {action:'addAdjust', date: qs('adjDate').value, party: qs('adjParty').value, yarn: qs('adjYarn').value, qty: Number(qs('adjQty').value||0) };
+  if(!body.party || !body.yarn || !body.date || !body.qty){ alert('Fill all fields'); return; }
+  try{
+    const res = await fetchJSON(`${API}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(res && res.status==='ok'){ modal.style.display='none'; loadLedger(); }
+    else alert('Backend refused: '+JSON.stringify(res));
+  }catch(e){ alert('Backend POST not enabled. Ask to add addAdjust endpoint.'); }
+};
 
-  const ledger = await loadLedger();
+// Buttons
+qs('loadBtn').onclick=loadLedger;
+qs('resetBtn').onclick=()=>{ ['yarn','from','to'].forEach(id=>qs(id).value=''); };
 
-  const filtered = ledger.filter(r =>
-    (!party || r.party === party) &&
-    (!yarn  || r.yarn === yarn)
-  );
-
-  renderTable(filtered);
-}
-
-function renderTable(rows) {
-  let html = `
-    <table>
-      <tr>
-        <th>Date</th><th>Party</th><th>Yarn</th><th>Qty</th><th>Type</th>
-      </tr>
-  `;
-
-  rows.forEach(r=>{
-    html += `
-      <tr>
-        <td>${r.date}</td>
-        <td>${r.party}</td>
-        <td>${r.yarn}</td>
-        <td>${r.qty}</td>
-        <td>${r.type}</td>
-      </tr>
-    `;
-  });
-
-  html += "</table>";
-
-  document.getElementById("tableArea").innerHTML = html;
-}
-
-document.getElementById("partySelect").onchange = refreshTable;
-document.getElementById("yarnSelect").onchange  = refreshTable;
-
-loadDropdowns().then(refreshTable);
+loadDropdowns();
 </script>
-
 </body>
 </html>
