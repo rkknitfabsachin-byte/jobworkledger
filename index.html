@@ -9,16 +9,12 @@
   :root{
     --bg:#0a0c12; --card:#111624; --glass:rgba(255,255,255,.06);
     --text:#eaf1ff; --muted:#9fb0d1; --line:rgba(255,255,255,.1);
-    --accent:#35d7ff; --accent2:#00ffd5; --warn:#ffb020; --bad:#ff6b81; --ok:#7dff8c;
+    --accent:#35d7ff; --accent2:#00ffd5; --bad:#ff6b81; --ok:#7dff8c;
   }
   *{box-sizing:border-box}
   body{margin:0;font-family:Inter,system-ui; background:var(--bg); color:var(--text)}
   .hidden{display:none}
 
-  /* WRAPPER */
-  .wrap{padding-bottom:86px}
-
-  /* BRAND HEADER */
   .brand{position:sticky;top:0;z-index:20;backdrop-filter:blur(12px);
     background:linear-gradient(180deg,rgba(10,12,18,.8),rgba(10,12,18,.35));
     border-bottom:1px solid var(--line)}
@@ -38,17 +34,12 @@
   .glass{background:var(--glass)}
 
   label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
-  select,input[type=date],input[type=text],input[type=number]{
-    width:100%;padding:12px;border-radius:12px;border:1px solid var(--line);
-    background:transparent;color:var(--text)
-  }
-
+  select,input[type=date],input[type=number]{width:100%;padding:12px;border-radius:12px;border:1px solid var(--line);background:transparent;color:var(--text)}
   .actions{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
   .btn{border:none;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer}
   .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#001118}
   .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--text)}
 
-  /* KPIs */
   .kpis{display:grid;gap:12px;grid-template-columns:repeat(4,1fr)}
   @media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}}
   .kpi{padding:14px;border-radius:14px;background:var(--glass);border:1px solid var(--line)}
@@ -62,30 +53,20 @@
   .pos{color:var(--ok);font-weight:800}
   .neg{color:var(--bad);font-weight:800}
 
-  /* NAV */
   .nav{position:fixed;left:0;right:0;bottom:14px;z-index:30;display:flex;justify-content:center}
-  .nav-inner{display:flex;gap:10px;background:rgba(255,255,255,.06);border:1px solid var(--line);
-    backdrop-filter:blur(16px);border-radius:22px;padding:8px}
+  .nav-inner{display:flex;gap:10px;background:rgba(255,255,255,.06);border:1px solid var(--line);backdrop-filter:blur(16px);border-radius:22px;padding:8px}
   .tab{padding:10px 14px;border-radius:14px;cursor:pointer}
   .tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#001118;font-weight:800}
 
-  /* MODAL */
-  #modal{
-    position:fixed;inset:0;background:rgba(0,0,0,.55);
-    display:flex;align-items:center;justify-content:center;z-index:9999
-  }
+  /* modal */
+  #modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:9999}
+  #modal.open{display:flex}
   #modal .card{animation:pop .25s ease-out}
-  @keyframes pop{
-    0%{transform:scale(.7);opacity:0}
-    100%{transform:scale(1);opacity:1}
-  }
+  @keyframes pop{0%{transform:scale(.9);opacity:0}100%{transform:scale(1);opacity:1}}
 </style>
 </head>
 
 <body>
-<div class="wrap">
-
-  <!-- BRAND HEADER -->
   <div class="brand">
     <div class="brand-inner">
       <span class="dot"></span>
@@ -96,23 +77,15 @@
   </div>
 
   <div class="container">
-    
     <!-- HOME -->
     <section id="view-home">
       <div class="grid grid-3">
-        <div class="card glass">
-          <label>Quick Party</label>
-          <select id="homeParty"></select>
-        </div>
-        <div class="card glass">
-          <label>Quick Yarn</label>
-          <select id="homeYarn"></select>
-        </div>
+        <div class="card glass"><label>Quick Party</label><select id="homeParty"></select></div>
+        <div class="card glass"><label>Quick Yarn</label><select id="homeYarn"></select></div>
         <div class="card glass">
           <label>Quick Range</label>
           <div class="grid grid-2" style="gap:8px">
-            <input type="date" id="homeFrom"/>
-            <input type="date" id="homeTo"/>
+            <input type="date" id="homeFrom"/><input type="date" id="homeTo"/>
           </div>
         </div>
       </div>
@@ -130,10 +103,7 @@
       </div>
 
       <div class="tablewrap">
-        <table id="homeTable">
-          <thead><tr><th>Date</th><th>Party</th><th>Yarn</th><th>Qty</th><th>Type</th></tr></thead>
-          <tbody></tbody>
-        </table>
+        <table id="homeTable"><thead><tr><th>Date</th><th>Party</th><th>Yarn</th><th>Qty</th><th>Type</th></tr></thead><tbody></tbody></table>
       </div>
     </section>
 
@@ -142,15 +112,11 @@
       <div class="grid grid-3">
         <div class="card glass"><label>Party</label><select id="sParty"></select></div>
         <div class="card glass"><label>Yarn</label><select id="sYarn"></select></div>
-        <div class="card glass"><label>As of</label><input type="date" id="sAsOf"/></div>
+        <div class="card glass"><label>As of</label><input type="date" id="sAsOf"></div>
       </div>
-      <div class="actions">
-        <button class="btn btn-primary" id="stockLoad">Show Stock</button>
-      </div>
+      <div class="actions"><button class="btn btn-primary" id="stockLoad">Show Stock</button></div>
       <div class="tablewrap">
-        <table id="stockTable"><thead>
-          <tr><th>Yarn</th><th>Incoming</th><th>Outgoing</th><th>Return+Adj</th><th>Balance</th></tr>
-        </thead><tbody></tbody></table>
+        <table id="stockTable"><thead><tr><th>Yarn</th><th>Incoming</th><th>Outgoing</th><th>Return+Adj</th><th>Balance</th></tr></thead><tbody></tbody></table>
       </div>
     </section>
 
@@ -159,7 +125,8 @@
       <div class="grid grid-3">
         <div class="card glass"><label>Party</label><select id="lParty"></select></div>
         <div class="card glass"><label>Yarn</label><select id="lYarn"></select></div>
-        <div class="card glass"><label>Date Range</label>
+        <div class="card glass">
+          <label>Date Range</label>
           <div class="grid grid-2" style="gap:8px">
             <input type="date" id="lFrom"/><input type="date" id="lTo"/>
           </div>
@@ -170,283 +137,134 @@
         <button class="btn btn-ghost" id="ledgerClear">Clear</button>
       </div>
       <div class="tablewrap">
-        <table id="ledgerTable"><thead>
-          <tr><th>Date</th><th>Party</th><th>Yarn</th><th>Qty</th><th>Type</th></tr>
-        </thead><tbody></tbody></table>
+        <table id="ledgerTable"><thead><tr><th>Date</th><th>Party</th><th>Yarn</th><th>Qty</th><th>Type</th></tr></thead><tbody></tbody></table>
       </div>
     </section>
 
-  </div>
-
-  <!-- NAV -->
-  <div class="nav">
-    <div class="nav-inner">
-      <div class="tab active" data-view="home">🏠 Home</div>
-      <div class="tab" data-view="stock">📦 Stock</div>
-      <div class="tab" data-view="ledger">📊 Ledger</div>
-      <div class="tab" id="tabAdd">➕ Add</div>
-    </div>
-  </div>
-
-</div>
-
-<!-- CLEAN MODAL -->
-<div id="modal" class="hidden">
-  <div class="card" style="max-width:480px;width:90%">
-    <h3>Add Adjustment</h3>
-
-    <div class="grid grid-2">
-      <div>
-        <label>Date</label>
-        <input type="date" id="adjDate">
-      </div>
-      <div>
-        <label>Qty (+/-)</label>
-        <input type="number" id="adjQty" step="0.01">
-      </div>
-      <div>
-        <label>Party</label>
-        <select id="adjParty"></select>
-      </div>
-      <div>
-        <label>Yarn</label>
-        <select id="adjYarn"></select>
+    <!-- NAV -->
+    <div class="nav">
+      <div class="nav-inner">
+        <div class="tab active" data-view="home">🏠 Home</div>
+        <div class="tab" data-view="stock">📦 Stock</div>
+        <div class="tab" data-view="ledger">📊 Ledger</div>
+        <div class="tab" id="tabAdd">➕ Add</div>
       </div>
     </div>
+  </div>
 
-    <div class="actions">
-      <button class="btn btn-primary" id="saveAdj">Save</button>
-      <button class="btn btn-ghost" id="closeAdj">Close</button>
+  <!-- Modal -->
+  <div id="modal">
+    <div class="card" style="max-width:520px;width:92%">
+      <h3 style="margin:0 0 10px">Add Adjustment</h3>
+      <div class="grid grid-2">
+        <div><label>Date</label><input id="adjDate" type="date"></div>
+        <div><label>Qty (+/-)</label><input id="adjQty" type="number" step="0.01"></div>
+        <div><label>Party</label><select id="adjParty"></select></div>
+        <div><label>Yarn</label><select id="adjYarn"></select></div>
+      </div>
+      <div class="actions"><button class="btn btn-primary" id="saveAdj">Save</button><button class="btn btn-ghost" id="closeAdj">Close</button></div>
     </div>
   </div>
-</div>
 
 <script>
-document.addEventListener("DOMContentLoaded", init);
+const API_BASE = 'https://job-workrk.rkknitfabsachin.workers.dev/'; 
+// OR directly Apps Script: const API_BASE = 'https://script.google.com/macros/s/DEPLOY_ID/exec';
 
-function init(){
-  const API = "https://job-workrk.rkknitfabsachin.workers.dev";
-
-  const $ = (id)=>document.getElementById(id);
-  const show = (v)=>{
-    ["home","stock","ledger"].forEach(s=>{
-      $("view-"+s).classList.toggle("hidden", s!==v);
-    });
-    document.querySelectorAll(".tab").forEach(t=>{
-      t.classList.toggle("active", t.dataset.view===v);
-    });
+document.addEventListener('DOMContentLoaded', () => {
+  const $ = id => document.getElementById(id);
+  const showView = v => {
+    ['home','stock','ledger'].forEach(s => $('view-'+s).classList.toggle('hidden', s!==v));
+    document.querySelectorAll('.tab[data-view]').forEach(t => t.classList.toggle('active', t.dataset.view===v));
   };
 
-  // Theme
-  $("themeBtn").onclick = ()=>{
-    document.body.classList.toggle("light");
-  };
+  $('themeBtn').onclick = () => document.body.classList.toggle('light');
 
-  // NAV
-  document.querySelectorAll(".tab[data-view]").forEach(t=>{
-    t.onclick = ()=> show(t.dataset.view);
-  });
+  document.querySelectorAll('.tab[data-view]').forEach(t => t.onclick = () => showView(t.dataset.view));
 
-  $("tabAdd").onclick = ()=>{
-    $("modal").classList.remove("hidden");
-    $("adjDate").valueAsDate = new Date();
-  };
+  $('tabAdd').onclick = () => { $('modal').classList.add('open'); $('adjDate').valueAsDate = new Date(); };
+  $('closeAdj').onclick = () => $('modal').classList.remove('open');
+  $('modal').addEventListener('click', e => { if (e.target === $('modal')) $('modal').classList.remove('open'); });
 
-  $("closeAdj").onclick = ()=>{
-    $("modal").classList.add("hidden");
-  };
+  const j = async url => (await fetch(url)).json();
+  const post = async body => (await fetch(API_BASE, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) })).json();
 
-  // Fetch wrappers
-  async function j(url){
-    const r = await fetch(url);
-    return r.json();
-  }
-
-  async function post(body){
-    const r = await fetch(API, {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify(body)
-    });
-    return r.json();
-  }
-
-  // Load parties + yarns
   async function loadMasters(){
-    let p = await j(API+"?action=parties");
-    let y = await j(API+"?action=yarns");
-
-    ["homeParty","sParty","lParty","adjParty"]
-      .forEach(id=> $(id).innerHTML = `<option value="">Select</option>`+p.map(x=>`<option>${x}</option>`));
-
-    ["homeYarn","sYarn","lYarn","adjYarn"]
-      .forEach(id=> $(id).innerHTML = `<option value="">All</option>`+y.map(x=>`<option>${x}</option>`));
+    const parties = await j(API_BASE + '?action=parties');
+    const yarns   = await j(API_BASE + '?action=yarns');
+    ['homeParty','sParty','lParty','adjParty'].forEach(id => $(id).innerHTML = `<option value="">Select</option>` + parties.map(p=>`<option>${p}</option>`).join(''));
+    ['homeYarn','sYarn','lYarn','adjYarn'].forEach(id => $(id).innerHTML = `<option value="">All</option>` + yarns.map(y=>`<option>${y}</option>`).join(''));
   }
 
-  // Dependent yarn filtering
   async function filterYarns(selParty, selYarn){
-    const party = $(selParty).value;
-    if(!party) return;
-
-    const rows = await j(API+"?action=ledger&party="+encodeURIComponent(party));
-    const set = [...new Set(rows.map(r=>r.yarn))].filter(Boolean);
-
-    $(selYarn).innerHTML = `<option value="">All</option>` + set.map(y=>`<option>${y}</option>`).join("");
+    const party = $(selParty).value; if(!party) return;
+    const rows = await j(API_BASE + '?action=ledger&party='+encodeURIComponent(party));
+    const set = [...new Set(rows.map(r=>r.yarn))].filter(Boolean).sort();
+    $(selYarn).innerHTML = `<option value="">All</option>` + set.map(y=>`<option>${y}</option>`).join('');
   }
 
-  ["homeParty","sParty","lParty","adjParty"].forEach(id=>{
-    $(id).addEventListener("change", ()=>{
-      const map = {
-        homeParty:"homeYarn",
-        sParty:"sYarn",
-        lParty:"lYarn",
-        adjParty:"adjYarn"
-      };
+  ['homeParty','sParty','lParty','adjParty'].forEach(id => {
+    $(id).addEventListener('change', () => {
+      const map = {homeParty:'homeYarn', sParty:'sYarn', lParty:'lYarn', adjParty:'adjYarn'};
       filterYarns(id, map[id]);
     });
   });
 
-  // Refresh Home
-  async function refreshHome(){
-    const party = $("homeParty").value;
-    if(!party) return alert("Select party");
+  function fmt(n){ return Number(n||0).toLocaleString(undefined,{maximumFractionDigits:2}); }
+  const ddmmyyyy = d => { const x=new Date(d); return isNaN(x)? String(d) : x.toLocaleDateString('en-GB'); };
 
-    let url = API+"?action=ledger&party="+encodeURIComponent(party);
-    const yarn = $("homeYarn").value;
-    const from = $("homeFrom").value;
-    const to   = $("homeTo").value;
-
-    if(yarn) url += "&yarn="+encodeURIComponent(yarn);
-    if(from) url += "&from="+from;
-    if(to)   url += "&to="+to;
-
+  $('homeLoad').onclick = async ()=>{
+    const party = $('homeParty').value; if(!party) return alert('Select party');
+    let url = API_BASE + '?action=ledger&party='+encodeURIComponent(party);
+    const yarn=$('homeYarn').value, from=$('homeFrom').value, to=$('homeTo').value;
+    if(yarn) url += '&yarn='+encodeURIComponent(yarn);
+    if(from) url += '&from='+from;
+    if(to)   url += '&to='+to;
     const rows = await j(url);
 
     let inc=0,out=0,ret=0,adj=0;
-    rows.forEach(r=>{
-      if(r.type==="Incoming") inc+=r.qty;
-      else if(r.type==="Outgoing") out+=Math.abs(r.qty);
-      else if(r.type==="Return") ret+=r.qty;
-      else if(r.type==="Adjust") adj+=r.qty;
-    });
+    rows.forEach(r=>{ if(r.type==='Incoming') inc+=r.qty; else if(r.type==='Outgoing') out+=Math.abs(r.qty); else if(r.type==='Return') ret+=r.qty; else if(r.type==='Adjust') adj+=r.qty; });
+    $('kIn').textContent=fmt(inc); $('kOut').textContent=fmt(out); $('kRet').textContent=fmt(ret+adj); $('kBal').textContent=fmt(inc-out+ret+adj);
+    $('homeTable').querySelector('tbody').innerHTML = rows.map(r=>`<tr><td>${ddmmyyyy(r.date)}</td><td>${r.party||''}</td><td>${r.yarn||''}</td><td class="${r.qty>=0?'pos':'neg'}">${fmt(r.qty)}</td><td>${r.type}</td></tr>`).join('');
+  };
 
-    $("kIn").textContent = inc;
-    $("kOut").textContent= out;
-    $("kRet").textContent= ret+adj;
-    $("kBal").textContent= inc-out+ret+adj;
-
-    $("homeTable").querySelector("tbody").innerHTML =
-      rows.map(r=>`
-        <tr>
-          <td>${formatDate(r.date)}</td>
-          <td>${r.party}</td>
-          <td>${r.yarn}</td>
-          <td class="${r.qty>=0?'pos':'neg'}">${r.qty}</td>
-          <td>${r.type}</td>
-        </tr>
-      `).join("");
-  }
-
-  function formatDate(d){
-    let dt = new Date(d);
-    if(isNaN(dt)) return d;
-    return dt.toLocaleDateString("en-GB");
-  }
-
-  $("homeLoad").onclick = refreshHome;
-
-  // STOCK
-  $("stockLoad").onclick = async ()=>{
-    const party = $("sParty").value;
-    if(!party) return alert("Select party");
-
-    let url = API+"?action=ledger&party="+encodeURIComponent(party);
-    const yarn = $("sYarn").value;
-    const asof = $("sAsOf").value;
-    if(yarn) url+="&yarn="+yarn;
-    if(asof) url+="&to="+asof;
-
+  $('stockLoad').onclick = async ()=>{
+    const party = $('sParty').value; if(!party) return alert('Select party');
+    let url = API_BASE + '?action=ledger&party='+encodeURIComponent(party);
+    const yarn=$('sYarn').value, asof=$('sAsOf').value;
+    if(yarn) url += '&yarn='+encodeURIComponent(yarn);
+    if(asof) url += '&to='+asof;
     const rows = await j(url);
     const m = {};
-
-    rows.forEach(r=>{
-      if(!m[r.yarn]) m[r.yarn]={in:0,out:0,ret:0,adj:0};
-      if(r.type==="Incoming") m[r.yarn].in+=r.qty;
-      else if(r.type==="Outgoing") m[r.yarn].out+=Math.abs(r.qty);
-      else if(r.type==="Return")  m[r.yarn].ret+=r.qty;
-      else if(r.type==="Adjust")  m[r.yarn].adj+=r.qty;
-    });
-
-    $("stockTable").querySelector("tbody").innerHTML =
-      Object.keys(m).map(y=>`
-        <tr>
-          <td>${y}</td>
-          <td>${m[y].in}</td>
-          <td>${m[y].out}</td>
-          <td>${m[y].ret+m[y].adj}</td>
-          <td>${m[y].in - m[y].out + m[y].ret + m[y].adj}</td>
-        </tr>
-      `).join("");
+    rows.forEach(r=>{ const y=r.yarn||'—'; m[y] ??= {in:0,out:0,ret:0,adj:0};
+      if(r.type==='Incoming') m[y].in+=r.qty; else if(r.type==='Outgoing') m[y].out+=Math.abs(r.qty);
+      else if(r.type==='Return') m[y].ret+=r.qty; else if(r.type==='Adjust') m[y].adj+=r.qty; });
+    $('stockTable').querySelector('tbody').innerHTML = Object.keys(m).sort().map(y=>`<tr><td>${y}</td><td>${fmt(m[y].in)}</td><td>${fmt(m[y].out)}</td><td>${fmt(m[y].ret+m[y].adj)}</td><td class="${(m[y].in-m[y].out+m[y].ret+m[y].adj)>=0?'pos':'neg'}">${fmt(m[y].in-m[y].out+m[y].ret+m[y].adj)}</td></tr>`).join('');
   };
 
-  // LEDGER
-  $("ledgerLoad").onclick = async ()=>{
-    const party = $("lParty").value;
-    if(!party) return alert("Select party");
-    let url = API+"?action=ledger&party="+encodeURIComponent(party);
-    const yarn = $("lYarn").value;
-    const from = $("lFrom").value;
-    const to = $("lTo").value;
-    if(yarn) url+="&yarn="+yarn;
-    if(from) url+="&from="+from;
-    if(to) url+="&to="+to;
-
+  $('ledgerLoad').onclick = async ()=>{
+    const party = $('lParty').value; if(!party) return alert('Select party');
+    let url = API_BASE + '?action=ledger&party='+encodeURIComponent(party);
+    const yarn=$('lYarn').value, from=$('lFrom').value, to=$('lTo').value;
+    if(yarn) url += '&yarn='+encodeURIComponent(yarn);
+    if(from) url += '&from='+from;
+    if(to)   url += '&to='+to;
     const rows = await j(url);
-    $("ledgerTable").querySelector("tbody").innerHTML =
-      rows.map(r=>`
-        <tr>
-          <td>${formatDate(r.date)}</td>
-          <td>${r.party}</td>
-          <td>${r.yarn}</td>
-          <td class="${r.qty>=0?'pos':'neg'}">${r.qty}</td>
-          <td>${r.type}</td>
-        </tr>
-      `).join("");
+    $('ledgerTable').querySelector('tbody').innerHTML = rows.map(r=>`<tr><td>${ddmmyyyy(r.date)}</td><td>${r.party||''}</td><td>${r.yarn||''}</td><td class="${r.qty>=0?'pos':'neg'}">${fmt(r.qty)}</td><td>${r.type}</td></tr>`).join('');
   };
 
-  $("ledgerClear").onclick = ()=>{
-    $("lYarn").value="";
-    $("lFrom").value="";
-    $("lTo").value="";
+  $('ledgerClear').onclick = ()=>{ $('lYarn').value=''; $('lFrom').value=''; $('lTo').value=''; };
+
+  $('saveAdj').onclick = async ()=>{
+    const body = { action:'addAdjust', date:$('adjDate').value, party:$('adjParty').value, yarn:$('adjYarn').value, qty:Number($('adjQty').value) };
+    if(!body.party || !body.yarn || !body.date || !body.qty){ return alert('Please fill all fields'); }
+    const res = await post(body);
+    if(res.status === 'ok'){ alert('Saved'); $('modal').classList.remove('open'); $('homeLoad').click(); }
+    else alert('Backend error: '+JSON.stringify(res));
   };
 
-  // SAVE ADJUSTMENT
-  $("saveAdj").onclick = async ()=>{
-    let body = {
-      action:"addAdjust",
-      date:$("adjDate").value,
-      party:$("adjParty").value,
-      yarn:$("adjYarn").value,
-      qty:Number($("adjQty").value)
-    };
-
-    if(!body.party||!body.yarn||!body.date||!body.qty){
-      return alert("Please fill all fields");
-    }
-
-    let res = await post(body);
-    if(res.status==="ok"){
-      alert("Saved!");
-      $("modal").classList.add("hidden");
-      refreshHome();
-    }else{
-      alert("Backend error: "+JSON.stringify(res));
-    }
-  };
-
-  // INIT
+  // first load
   loadMasters();
-}
+});
 </script>
 </body>
 </html>
