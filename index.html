@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RK Knit Fab — Yarn Stock Ledger</title>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: #0d0f16;
+    color: #fff;
+  }
+  .container {
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+  }
+  h1 {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 20px;
+  }
+  .card {
+    background: rgba(255,255,255,0.08);
+    padding: 16px;
+    border-radius: 16px;
+    backdrop-filter: blur(14px);
+    box-shadow: 0 8px 22px rgba(0,0,0,0.3);
+    margin-bottom: 18px;
+    transition: 0.3s;
+  }
+  .card:hover {
+    transform: scale(1.01);
+  }
+  label { display: block; margin-top: 10px; font-weight: 600; }
+  select, input {
+    width: 100%; padding: 12px; border-radius: 10px;
+    border: none; margin-top: 5px;
+  }
+  button {
+    width: 100%; padding: 14px; border-radius: 10px;
+    border: none; background: #4f7cff; color: #fff; font-size: 17px;
+    margin-top: 18px; cursor: pointer;
+  }
+  table {
+    width: 100%; border-collapse: collapse; margin-top: 20px;
+  }
+  th, td {
+    padding: 10px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  th { background: rgba(255,255,255,0.06); }
+  .pos { color: #7dff8c; }
+  .neg { color: #ff7d7d; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>📦 Yarn Stock Ledger</h1>
+
+  <div class="card">
+    <label>Party</label>
+    <select id="party"></select>
+
+    <label>Yarn (optional)</label>
+    <select id="yarn"></select>
+
+    <label>Since</label>
+    <input type="date" id="since" />
+
+    <button onclick="fetchData()">Load Ledger</button>
+  </div>
+
+  <div id="result"></div>
+</div>
+
+<script>
+const API = "https://job-workrk.rkknitfabsachin.workers.dev";
+
+async function loadDropdowns() {
+  const p = await fetch(`${API}?action=parties`).then(r=>r.json());
+  const y = await fetch(`${API}?action=yarns`).then(r=>r.json());
+
+  let pSel = document.getElementById('party');
+  pSel.innerHTML = `<option value="">-- Select Party --</option>` +
+    p.parties.map(a=>`<option>${a}</option>`).join("");
+
+  let ySel = document.getElementById('yarn');
+  ySel.innerHTML = `<option value="">-- All Yarns --</option>` +
+    y.yarns.map(a=>`<option>${a}</option>`).join("");
+}
+
+async function fetchData() {
+  const party = document.getElementById('party').value;
+  if (!party) { alert("Please select party"); return; }
+  const yarn  = document.getElementById('yarn').value;
+  const since = document.getElementById('since').value;
+
+  let url = `${API}?action=partyStock&party=${encodeURIComponent(party)}`;
+  if (yarn) url += `&yarn=${encodeURIComponent(yarn)}`;
+  if (since) url += `&since=${since}`;
+
+  const data = await fetch(url).then(r=>r.json());
+
+  let html = `<div class='card'><table>
+    <tr><th>Yarn</th><th>Incoming</th><th>Outgoing</th><th>Returned</th><th>Balance</th></tr>`;
+
+  data.records.forEach(r=>{
+    html += `<tr>
+      <td>${r.yarn}</td>
+      <td>${r.incoming}</td>
+      <td>${r.outgoing}</td>
+      <td>${r.returned}</td>
+      <td class='${r.balance>=0?"pos":"neg"}'>${r.balance}</td>
+    </tr>`;
+  });
+
+  html += `</table></div>`;
+  document.getElementById('result').innerHTML = html;
+}
+
+loadDropdowns();
+</script>
+</body>
+</html>
