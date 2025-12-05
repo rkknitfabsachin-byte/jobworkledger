@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>RK KNIT FAB — Yarn Ledger</title>
+
 <style>
   :root{
     --bg:#0a0c12; --card:#111624; --glass:rgba(255,255,255,.06);
@@ -11,18 +12,19 @@
     --accent:#35d7ff; --accent2:#00ffd5; --warn:#ffb020; --bad:#ff6b81; --ok:#7dff8c;
   }
   *{box-sizing:border-box}
-  html,body{height:100%}
-  body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
-  a{color:inherit}
-  .wrap{min-height:100dvh;padding-bottom:86px}
+  body{margin:0;font-family:Inter,system-ui; background:var(--bg); color:var(--text)}
+  .hidden{display:none}
 
-  /* Brand header */
+  /* WRAPPER */
+  .wrap{padding-bottom:86px}
+
+  /* BRAND HEADER */
   .brand{position:sticky;top:0;z-index:20;backdrop-filter:blur(12px);
     background:linear-gradient(180deg,rgba(10,12,18,.8),rgba(10,12,18,.35));
     border-bottom:1px solid var(--line)}
   .brand-inner{max-width:1200px;margin:auto;padding:14px 18px;display:flex;align-items:center;gap:12px}
-  .dot{width:10px;height:10px;border-radius:999px;box-shadow:0 0 24px var(--accent2),0 0 48px var(--accent2);background:var(--accent2)}
-  .title{font-size:18px;font-weight:800;letter-spacing:.4px;text-shadow:0 0 16px rgba(0,255,213,.35)}
+  .dot{width:10px;height:10px;border-radius:50%;background:var(--accent2);box-shadow:0 0 14px var(--accent2)}
+  .title{font-size:18px;font-weight:800}
   .spacer{flex:1}
   .theme{border:1px solid var(--line);background:var(--glass);border-radius:12px;padding:8px 12px;cursor:pointer}
 
@@ -32,46 +34,58 @@
   .grid-3{grid-template-columns:repeat(3,1fr)}
   @media(max-width:900px){.grid-2,.grid-3{grid-template-columns:1fr}}
 
-  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
   .glass{background:var(--glass)}
 
   label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
-  select,input[type=date],input[type=text],input[type=number]{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:transparent;color:var(--text)}
+  select,input[type=date],input[type=text],input[type=number]{
+    width:100%;padding:12px;border-radius:12px;border:1px solid var(--line);
+    background:transparent;color:var(--text)
+  }
 
-  .actions{display:flex;gap:10px;flex-wrap:wrap}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
   .btn{border:none;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer}
   .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#001118}
   .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--text)}
 
+  /* KPIs */
   .kpis{display:grid;gap:12px;grid-template-columns:repeat(4,1fr)}
   @media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}}
   .kpi{padding:14px;border-radius:14px;background:var(--glass);border:1px solid var(--line)}
-  .kpi h3{margin:0 0 6px;font-size:12px;color:var(--muted)}
+  .kpi h3{margin:0;font-size:12px;color:var(--muted)}
   .kpi .val{font-size:22px;font-weight:900}
 
   .tablewrap{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
   table{width:100%;border-collapse:collapse;font-size:14px}
-  th,td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:left}
-  th{font-size:12px;color:var(--muted);background:linear-gradient(180deg,rgba(255,255,255,.05),transparent)}
-  tr:hover td{background:linear-gradient(90deg,rgba(53,215,255,.08),transparent)}
+  th,td{padding:12px 10px;border-bottom:1px solid var(--line)}
+  th{font-size:12px;color:var(--muted)}
   .pos{color:var(--ok);font-weight:800}
   .neg{color:var(--bad);font-weight:800}
 
   /* NAV */
   .nav{position:fixed;left:0;right:0;bottom:14px;z-index:30;display:flex;justify-content:center}
-  .nav-inner{display:flex;gap:10px;background:rgba(255,255,255,.06);border:1px solid var(--line);backdrop-filter:blur(16px);border-radius:22px;padding:8px;box-shadow:0 20px 40px rgba(0,0,0,.45)}
-  .tab{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:14px;cursor:pointer}
+  .nav-inner{display:flex;gap:10px;background:rgba(255,255,255,.06);border:1px solid var(--line);
+    backdrop-filter:blur(16px);border-radius:22px;padding:8px}
+  .tab{padding:10px 14px;border-radius:14px;cursor:pointer}
   .tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#001118;font-weight:800}
 
-  .muted{color:var(--muted)}
-  .hidden{display:none}
-
-  /* Test output */
-  #testlog{font-family:ui-monospace,monospace;font-size:12px;white-space:pre-wrap;background:var(--glass);border:1px solid var(--line);padding:10px;border-radius:12px;margin-top:12px}
+  /* MODAL */
+  #modal{
+    position:fixed;inset:0;background:rgba(0,0,0,.55);
+    display:flex;align-items:center;justify-content:center;z-index:9999
+  }
+  #modal .card{animation:pop .25s ease-out}
+  @keyframes pop{
+    0%{transform:scale(.7);opacity:0}
+    100%{transform:scale(1);opacity:1}
+  }
 </style>
 </head>
+
 <body>
 <div class="wrap">
+
+  <!-- BRAND HEADER -->
   <div class="brand">
     <div class="brand-inner">
       <span class="dot"></span>
@@ -82,6 +96,7 @@
   </div>
 
   <div class="container">
+    
     <!-- HOME -->
     <section id="view-home">
       <div class="grid grid-3">
@@ -109,42 +124,29 @@
         <div class="kpi"><h3>Balance</h3><div id="kBal" class="val">0</div></div>
       </div>
 
-      <div class="actions" style="margin-bottom:10px">
+      <div class="actions">
         <button class="btn btn-primary" id="homeLoad">Refresh</button>
         <button class="btn btn-ghost" id="openAdjust">Add Adjustment</button>
       </div>
 
       <div class="tablewrap">
-        <table id="homeTable"><thead>
-          <tr><th>Date</th><th>Party</th><th>Yarn</th><th>Qty</th><th>Type</th></tr>
-        </thead><tbody></tbody></table>
+        <table id="homeTable">
+          <thead><tr><th>Date</th><th>Party</th><th>Yarn</th><th>Qty</th><th>Type</th></tr></thead>
+          <tbody></tbody>
+        </table>
       </div>
-
-      <div id="testlog" class="hidden"></div>
     </section>
 
-    <!-- STOCK SUMMARY -->
+    <!-- STOCK -->
     <section id="view-stock" class="hidden">
       <div class="grid grid-3">
-        <div class="card glass">
-          <label>Party</label>
-          <select id="sParty"></select>
-        </div>
-        <div class="card glass">
-          <label>Yarn (optional)</label>
-          <select id="sYarn"></select>
-        </div>
-        <div class="card glass">
-          <label>As of (optional)</label>
-          <input type="date" id="sAsOf"/>
-        </div>
+        <div class="card glass"><label>Party</label><select id="sParty"></select></div>
+        <div class="card glass"><label>Yarn</label><select id="sYarn"></select></div>
+        <div class="card glass"><label>As of</label><input type="date" id="sAsOf"/></div>
       </div>
-
-      <div class="actions" style="margin:12px 0">
+      <div class="actions">
         <button class="btn btn-primary" id="stockLoad">Show Stock</button>
-        <span class="muted" id="stockNote">Shows Incoming − Outgoing + Return + Adjust</span>
       </div>
-
       <div class="tablewrap">
         <table id="stockTable"><thead>
           <tr><th>Yarn</th><th>Incoming</th><th>Outgoing</th><th>Return+Adj</th><th>Balance</th></tr>
@@ -159,13 +161,12 @@
         <div class="card glass"><label>Yarn</label><select id="lYarn"></select></div>
         <div class="card glass"><label>Date Range</label>
           <div class="grid grid-2" style="gap:8px">
-            <input type="date" id="lFrom"/>
-            <input type="date" id="lTo"/>
+            <input type="date" id="lFrom"/><input type="date" id="lTo"/>
           </div>
         </div>
       </div>
-      <div class="actions" style="margin:12px 0">
-        <button class="btn btn-primary" id="ledgerLoad">Load Ledger</button>
+      <div class="actions">
+        <button class="btn btn-primary" id="ledgerLoad">Load</button>
         <button class="btn btn-ghost" id="ledgerClear">Clear</button>
       </div>
       <div class="tablewrap">
@@ -175,39 +176,33 @@
       </div>
     </section>
 
-    <!-- SETTINGS (placeholder) -->
-    <section id="view-settings" class="hidden">
-      <div class="card glass">
-        <h3 style="margin:0 0 8px">Settings</h3>
-        <div class="muted">Coming soon: CSV export, PDF share, shortcuts, saved filters.</div>
-      </div>
-    </section>
   </div>
 
-  <!-- Floating Nav -->
+  <!-- NAV -->
   <div class="nav">
     <div class="nav-inner">
       <div class="tab active" data-view="home">🏠 Home</div>
       <div class="tab" data-view="stock">📦 Stock</div>
       <div class="tab" data-view="ledger">📊 Ledger</div>
       <div class="tab" id="tabAdd">➕ Add</div>
-      <div class="tab" data-view="settings">⚙ Settings</div>
     </div>
   </div>
+
 </div>
 
-<!-- Adjustment Modal -->
-<div id="modal" class="hidden" style="position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55);pointer-events:auto">
-  <div class="card" style="max-width:520px;width:92%;pointer-events:auto">
-    <h3 style="margin:0 0 10px">Add Adjustment</h3>
+<!-- CLEAN MODAL -->
+<div id="modal" class="hidden">
+  <div class="card" style="max-width:480px;width:90%">
+    <h3>Add Adjustment</h3>
+
     <div class="grid grid-2">
       <div>
         <label>Date</label>
-        <input id="adjDate" type="date">
+        <input type="date" id="adjDate">
       </div>
       <div>
         <label>Qty (+/-)</label>
-        <input id="adjQty" type="number" step="0.01">
+        <input type="number" id="adjQty" step="0.01">
       </div>
       <div>
         <label>Party</label>
@@ -218,205 +213,239 @@
         <select id="adjYarn"></select>
       </div>
     </div>
-    <div class="actions" style="margin-top:12px">
+
+    <div class="actions">
       <button class="btn btn-primary" id="saveAdj">Save</button>
       <button class="btn btn-ghost" id="closeAdj">Close</button>
-    </div>
-  </div>
-</div>
-      <div>
-        <label>Qty (+/-)</label>
-        <input id="adjQty" type="number" step="0.01">
-      </div>
-      <div>
-        <label>Party</label>
-        <select id="adjParty"></select>
-      </div>
-      <div>
-        <label>Yarn</label>
-        <select id="adjYarn"></select>
-      </div>
-    </div>
-    <div class="actions" style="margin-top:12px">
-      <button class="btn btn-primary" id="saveAdj">Save</button>
-      <button class="btn btn-ghost" id="closeAdj">Close</button>
-      <span class="muted">Writes to STOCK_ADJUST (backend POST required).</span>
     </div>
   </div>
 </div>
 
 <script>
-// Wrap everything to ensure DOM is ready before accessing elements
-(document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', initApp) : initApp());
+document.addEventListener("DOMContentLoaded", init);
 
-function initApp(){
-  const API = "https://job-workrk.rkknitfabsachin.workers.dev"; // Worker base
+function init(){
+  const API = "https://job-workrk.rkknitfabsachin.workers.dev";
 
-  // ------- Small test harness (shows in console + optional div) -------
-  const testlog = document.getElementById('testlog');
-  const log = (msg) => { console.log('[TEST]', msg); if(testlog){ testlog.classList.remove('hidden'); testlog.textContent += `\n${msg}`; } };
-  const must = (el, id) => { if(!el){ const m = `❌ Missing #${id}`; log(m); throw new Error(m); } log(`✅ Found #${id}`); return el; };
-
-  // Theme toggle (guarded)
-  const themeBtn = must(document.getElementById('themeBtn'), 'themeBtn');
-  let dark = true;
-  themeBtn.onclick = () => {
-    dark = !dark;
-    document.body.style.background = dark
-      ? getComputedStyle(document.documentElement).getPropertyValue('--bg')
-      : '#0a0c12';
-  };
-
-  // Mini helpers
-  const $ = (id) => must(document.getElementById(id), id);
-  const fmtQty = (n) => Number(n||0).toLocaleString(undefined,{maximumFractionDigits:2});
-  const ddmmyyyy = (d) => {
-    if(!d) return '';
-    const x = new Date(d);
-    if(isNaN(x)) { // try dd/MM/yyyy
-      const p = String(d).split('/');
-      if(p.length===3) return `${p[0].padStart(2,'0')}/${p[1].padStart(2,'0')}/${p[2]}`;
-      return String(d);
-    }
-    const dd = String(x.getDate()).padStart(2,'0');
-    const mm = String(x.getMonth()+1).padStart(2,'0');
-    return `${dd}/${mm}/${x.getFullYear()}`;
-  };
-  const getJSON = async (url, opts) => {
-    const r = await fetch(url, opts);
-    const t = await r.text();
-    try { return JSON.parse(t); }
-    catch(e){ console.error('Bad JSON:', t); throw e; }
-  };
-
-  // Populate dropdowns
-  async function loadPartiesAndYarns(){
-    const partiesResp = await getJSON(`${API}?action=parties`);
-    const yarnsResp   = await getJSON(`${API}?action=yarns`);
-    const parties = Array.isArray(partiesResp)? partiesResp : (partiesResp.parties||[]);
-    const yarns   = Array.isArray(yarnsResp)? yarnsResp   : (yarnsResp.yarns||[]);
-    ;['homeParty','sParty','lParty','adjParty'].forEach(id=>$(id).innerHTML = `<option value="">-- Select Party --</option>`+parties.map(p=>`<option>${p}</option>`).join(''));
-    ;['homeYarn','sYarn','lYarn','adjYarn'].forEach(id=>$(id).innerHTML = `<option value="">-- All Yarns --</option>`+yarns.map(y=>`<option>${y}</option>`).join(''));
-    log('✅ Dropdowns populated');
-  }
-
-  // When party changes → limit yarns to that party (by probing ledger once)
-  async function filterYarnsFor(selectPartyId, selectYarnId){
-    const party = $(selectPartyId).value; if(!party) return;
-    const rows = await getJSON(`${API}?action=ledger&party=${encodeURIComponent(party)}`);
-    const set = new Set(rows.map(r=>r.yarn).filter(Boolean));
-    const list = Array.from(set).sort();
-    $(selectYarnId).innerHTML = `<option value="">-- All Yarns --</option>` + list.map(y=>`<option>${y}</option>`).join('');
-    log(`🎯 Filtered yarns for party: ${party} (count: ${list.length})`);
-  }
-
-  // Home: load table + KPIs
-  async function refreshHome(){
-    const party = $('homeParty').value;
-    const yarn  = $('homeYarn').value;
-    const from  = $('homeFrom').value;
-    const to    = $('homeTo').value;
-    if(!party){ alert('Select a party'); return; }
-    let url = `${API}?action=ledger&party=${encodeURIComponent(party)}`;
-    if(yarn) url += `&yarn=${encodeURIComponent(yarn)}`;
-    if(from) url += `&from=${from}`;
-    if(to)   url += `&to=${to}`;
-    const rows = await getJSON(url);
-    // KPIs
-    let inc=0,out=0,ret=0,adj=0;
-    rows.forEach(r=>{ if(r.type==='Incoming') inc+=r.qty; else if(r.type==='Outgoing') out+=Math.abs(r.qty); else if(r.type==='Return') ret+=r.qty; else if(r.type==='Adjust') adj+=r.qty; });
-    $('kIn').textContent=fmtQty(inc);
-    $('kOut').textContent=fmtQty(out);
-    $('kRet').textContent=fmtQty(ret+adj);
-    $('kBal').textContent=fmtQty(inc-out+ret+adj);
-    // Table
-    const tb = $('homeTable').querySelector('tbody');
-    tb.innerHTML = rows.map(r=>`<tr><td>${ddmmyyyy(r.date)}</td><td>${r.party||''}</td><td>${r.yarn||''}</td><td class="${r.qty>=0?'pos':'neg'}">${fmtQty(r.qty)}</td><td>${r.type}</td></tr>`).join('');
-    log(`📄 Loaded home ledger rows: ${rows.length}`);
-  }
-
-  // Stock summary
-  async function showStock(){
-    const party=$('sParty').value; if(!party){ alert('Select a party'); return; }
-    const yarn = $('sYarn').value; const asof=$('sAsOf').value; // use as upper bound
-    let url = `${API}?action=ledger&party=${encodeURIComponent(party)}`; if(yarn) url += `&yarn=${encodeURIComponent(yarn)}`; if(asof) url += `&to=${asof}`;
-    const rows = await getJSON(url);
-    const m = {}; // yarn -> {in,out,ret,adj}
-    rows.forEach(r=>{
-      const y=r.yarn||'—'; if(!m[y]) m[y]={in:0,out:0,ret:0,adj:0};
-      if(r.type==='Incoming') m[y].in += r.qty; else if(r.type==='Outgoing') m[y].out += Math.abs(r.qty); else if(r.type==='Return') m[y].ret += r.qty; else if(r.type==='Adjust') m[y].adj += r.qty;
+  const $ = (id)=>document.getElementById(id);
+  const show = (v)=>{
+    ["home","stock","ledger"].forEach(s=>{
+      $("view-"+s).classList.toggle("hidden", s!==v);
     });
-    const arr = Object.keys(m).sort().map(y=>({yarn:y,in:m[y].in,out:m[y].out,ret:m[y].ret+m[y].adj,bal:m[y].in-m[y].out+m[y].ret+m[y].adj}));
-    const tb = $('stockTable').querySelector('tbody');
-    tb.innerHTML = arr.map(r=>`<tr><td>${r.yarn}</td><td>${fmtQty(r.in)}</td><td>${fmtQty(r.out)}</td><td>${fmtQty(r.ret)}</td><td class="${r.bal>=0?'pos':'neg'}">${fmtQty(r.bal)}</td></tr>`).join('');
-    log(`📦 Stock rows: ${arr.length}`);
+    document.querySelectorAll(".tab").forEach(t=>{
+      t.classList.toggle("active", t.dataset.view===v);
+    });
+  };
+
+  // Theme
+  $("themeBtn").onclick = ()=>{
+    document.body.classList.toggle("light");
+  };
+
+  // NAV
+  document.querySelectorAll(".tab[data-view]").forEach(t=>{
+    t.onclick = ()=> show(t.dataset.view);
+  });
+
+  $("tabAdd").onclick = ()=>{
+    $("modal").classList.remove("hidden");
+    $("adjDate").valueAsDate = new Date();
+  };
+
+  $("closeAdj").onclick = ()=>{
+    $("modal").classList.add("hidden");
+  };
+
+  // Fetch wrappers
+  async function j(url){
+    const r = await fetch(url);
+    return r.json();
   }
 
-  // Ledger page
-  async function loadLedger(){
-    const party=$('lParty').value; if(!party){ alert('Select a party'); return; }
-    const yarn=$('lYarn').value; const from=$('lFrom').value; const to=$('lTo').value;
-    let url = `${API}?action=ledger&party=${encodeURIComponent(party)}`; if(yarn) url+=`&yarn=${encodeURIComponent(yarn)}`; if(from) url+=`&from=${from}`; if(to) url+=`&to=${to}`;
-    const rows = await getJSON(url);
-    const tb=$('ledgerTable').querySelector('tbody');
-    tb.innerHTML = rows.map(r=>`<tr><td>${ddmmyyyy(r.date)}</td><td>${r.party||''}</td><td>${r.yarn||''}</td><td class="${r.qty>=0?'pos':'neg'}">${fmtQty(r.qty)}</td><td>${r.type}</td></tr>`).join('');
-    log(`📊 Ledger rows: ${rows.length}`);
+  async function post(body){
+    const r = await fetch(API, {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(body)
+    });
+    return r.json();
   }
 
-  // Party->Yarn dependent filters
-  ['homeParty','sParty','lParty','adjParty'].forEach(id=>{
-    document.addEventListener('change', async (e)=>{
-      if(e.target && e.target.id===id){
-        const map = {homeParty:'homeYarn', sParty:'sYarn', lParty:'lYarn', adjParty:'adjYarn'};
-        await filterYarnsFor(id, map[id]);
-      }
+  // Load parties + yarns
+  async function loadMasters(){
+    let p = await j(API+"?action=parties");
+    let y = await j(API+"?action=yarns");
+
+    ["homeParty","sParty","lParty","adjParty"]
+      .forEach(id=> $(id).innerHTML = `<option value="">Select</option>`+p.map(x=>`<option>${x}</option>`));
+
+    ["homeYarn","sYarn","lYarn","adjYarn"]
+      .forEach(id=> $(id).innerHTML = `<option value="">All</option>`+y.map(x=>`<option>${x}</option>`));
+  }
+
+  // Dependent yarn filtering
+  async function filterYarns(selParty, selYarn){
+    const party = $(selParty).value;
+    if(!party) return;
+
+    const rows = await j(API+"?action=ledger&party="+encodeURIComponent(party));
+    const set = [...new Set(rows.map(r=>r.yarn))].filter(Boolean);
+
+    $(selYarn).innerHTML = `<option value="">All</option>` + set.map(y=>`<option>${y}</option>`).join("");
+  }
+
+  ["homeParty","sParty","lParty","adjParty"].forEach(id=>{
+    $(id).addEventListener("change", ()=>{
+      const map = {
+        homeParty:"homeYarn",
+        sParty:"sYarn",
+        lParty:"lYarn",
+        adjParty:"adjYarn"
+      };
+      filterYarns(id, map[id]);
     });
   });
 
-  // Nav
-  const views = ['home','stock','ledger','settings'];
-  function show(view){
-    views.forEach(v=>{ document.getElementById('view-'+v).classList.toggle('hidden', v!==view); });
-    document.querySelectorAll('.tab').forEach(t=> t.classList.toggle('active', t.dataset.view===view));
+  // Refresh Home
+  async function refreshHome(){
+    const party = $("homeParty").value;
+    if(!party) return alert("Select party");
+
+    let url = API+"?action=ledger&party="+encodeURIComponent(party);
+    const yarn = $("homeYarn").value;
+    const from = $("homeFrom").value;
+    const to   = $("homeTo").value;
+
+    if(yarn) url += "&yarn="+encodeURIComponent(yarn);
+    if(from) url += "&from="+from;
+    if(to)   url += "&to="+to;
+
+    const rows = await j(url);
+
+    let inc=0,out=0,ret=0,adj=0;
+    rows.forEach(r=>{
+      if(r.type==="Incoming") inc+=r.qty;
+      else if(r.type==="Outgoing") out+=Math.abs(r.qty);
+      else if(r.type==="Return") ret+=r.qty;
+      else if(r.type==="Adjust") adj+=r.qty;
+    });
+
+    $("kIn").textContent = inc;
+    $("kOut").textContent= out;
+    $("kRet").textContent= ret+adj;
+    $("kBal").textContent= inc-out+ret+adj;
+
+    $("homeTable").querySelector("tbody").innerHTML =
+      rows.map(r=>`
+        <tr>
+          <td>${formatDate(r.date)}</td>
+          <td>${r.party}</td>
+          <td>${r.yarn}</td>
+          <td class="${r.qty>=0?'pos':'neg'}">${r.qty}</td>
+          <td>${r.type}</td>
+        </tr>
+      `).join("");
   }
-  document.querySelectorAll('.tab[data-view]').forEach(t=> t.onclick=()=> show(t.dataset.view));
-  document.getElementById('tabAdd').onclick = ()=>{
-  const m = document.getElementById('modal');
-  m.classList.remove('hidden');
-  m.style.pointerEvents = 'auto';
-  document.getElementById('adjDate').valueAsDate = new Date();
-}; document.getElementById('adjDate').valueAsDate=new Date(); };
-  document.getElementById('closeAdj').onclick = ()=>{
-  const m = document.getElementById('modal');
-  m.classList.add('hidden');
-  m.style.pointerEvents = 'none';
-};
-  document.getElementById('saveAdj').onclick = async ()=>{
-    const body = {action:'addAdjust', date:document.getElementById('adjDate').value, party:document.getElementById('adjParty').value, yarn:document.getElementById('adjYarn').value, qty:Number(document.getElementById('adjQty').value||0)};
-    if(!body.party||!body.yarn||!body.date||!body.qty){ alert('Fill all fields'); return; }
-    try{
-      const res = await getJSON(API, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
-      if(res && res.status==='ok'){ alert('Saved'); document.getElementById('modal').classList.add('hidden'); refreshHome(); }
-      else alert('Backend refused: '+JSON.stringify(res));
-    }catch(e){ alert('Enable POST addAdjust in backend'); }
+
+  function formatDate(d){
+    let dt = new Date(d);
+    if(isNaN(dt)) return d;
+    return dt.toLocaleDateString("en-GB");
+  }
+
+  $("homeLoad").onclick = refreshHome;
+
+  // STOCK
+  $("stockLoad").onclick = async ()=>{
+    const party = $("sParty").value;
+    if(!party) return alert("Select party");
+
+    let url = API+"?action=ledger&party="+encodeURIComponent(party);
+    const yarn = $("sYarn").value;
+    const asof = $("sAsOf").value;
+    if(yarn) url+="&yarn="+yarn;
+    if(asof) url+="&to="+asof;
+
+    const rows = await j(url);
+    const m = {};
+
+    rows.forEach(r=>{
+      if(!m[r.yarn]) m[r.yarn]={in:0,out:0,ret:0,adj:0};
+      if(r.type==="Incoming") m[r.yarn].in+=r.qty;
+      else if(r.type==="Outgoing") m[r.yarn].out+=Math.abs(r.qty);
+      else if(r.type==="Return")  m[r.yarn].ret+=r.qty;
+      else if(r.type==="Adjust")  m[r.yarn].adj+=r.qty;
+    });
+
+    $("stockTable").querySelector("tbody").innerHTML =
+      Object.keys(m).map(y=>`
+        <tr>
+          <td>${y}</td>
+          <td>${m[y].in}</td>
+          <td>${m[y].out}</td>
+          <td>${m[y].ret+m[y].adj}</td>
+          <td>${m[y].in - m[y].out + m[y].ret + m[y].adj}</td>
+        </tr>
+      `).join("");
   };
 
-  // Buttons actions
-  document.getElementById('homeLoad').onclick = refreshHome;
-  document.getElementById('stockLoad').onclick = showStock;
-  document.getElementById('ledgerLoad').onclick= loadLedger;
-  document.getElementById('ledgerClear').onclick=()=>{ ['lYarn','lFrom','lTo'].forEach(i=>document.getElementById(i).value=''); };
+  // LEDGER
+  $("ledgerLoad").onclick = async ()=>{
+    const party = $("lParty").value;
+    if(!party) return alert("Select party");
+    let url = API+"?action=ledger&party="+encodeURIComponent(party);
+    const yarn = $("lYarn").value;
+    const from = $("lFrom").value;
+    const to = $("lTo").value;
+    if(yarn) url+="&yarn="+yarn;
+    if(from) url+="&from="+from;
+    if(to) url+="&to="+to;
 
-  // Bootstrap
-  (async function init(){
-    try{
-      await loadPartiesAndYarns();
-      log('🚀 App initialized');
-    }catch(err){
-      console.error(err);
-      log('❌ Initialization failed: '+ err.message);
+    const rows = await j(url);
+    $("ledgerTable").querySelector("tbody").innerHTML =
+      rows.map(r=>`
+        <tr>
+          <td>${formatDate(r.date)}</td>
+          <td>${r.party}</td>
+          <td>${r.yarn}</td>
+          <td class="${r.qty>=0?'pos':'neg'}">${r.qty}</td>
+          <td>${r.type}</td>
+        </tr>
+      `).join("");
+  };
+
+  $("ledgerClear").onclick = ()=>{
+    $("lYarn").value="";
+    $("lFrom").value="";
+    $("lTo").value="";
+  };
+
+  // SAVE ADJUSTMENT
+  $("saveAdj").onclick = async ()=>{
+    let body = {
+      action:"addAdjust",
+      date:$("adjDate").value,
+      party:$("adjParty").value,
+      yarn:$("adjYarn").value,
+      qty:Number($("adjQty").value)
+    };
+
+    if(!body.party||!body.yarn||!body.date||!body.qty){
+      return alert("Please fill all fields");
     }
-  })();
+
+    let res = await post(body);
+    if(res.status==="ok"){
+      alert("Saved!");
+      $("modal").classList.add("hidden");
+      refreshHome();
+    }else{
+      alert("Backend error: "+JSON.stringify(res));
+    }
+  };
+
+  // INIT
+  loadMasters();
 }
 </script>
 </body>
