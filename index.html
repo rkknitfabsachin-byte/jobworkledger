@@ -141,6 +141,8 @@ body.light .nav-inner{background:rgba(0,0,0,.04)}
 
 /* Utility */
 .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
+.toast{position:fixed; right:16px; bottom:86px; background:var(--glass); border:1px solid var(--line); padding:10px 12px; border-radius:12px; display:none}
+.toast.show{display:block}
 </style>
 </head>
 
@@ -265,6 +267,8 @@ body.light .nav-inner{background:rgba(0,0,0,.04)}
     </div>
   </div>
 
+  <div class="toast" id="toast"><span id="toastMsg"></span></div>
+
 <!-- ===== APP LOGIC ===== -->
 <script>
 const API = "https://job-workrk.rkknitfabsachin.workers.dev"; // change if needed
@@ -273,15 +277,36 @@ const $ = (id) => document.getElementById(id);
 const fmt = (n) => Number(n||0).toLocaleString(undefined,{maximumFractionDigits:2});
 const dmy = (d)=>{ const x=new Date(d); return isNaN(x)?String(d):x.toLocaleDateString('en-GB'); };
 
+function toast(msg, type='info'){
+  const t=$('toast'), m=$('toastMsg');
+  m.textContent = msg;
+  m.style.color = (type==='error')? 'var(--bad)' : 'var(--text)';
+  t.classList.add('show');
+  clearTimeout(toast._h); toast._h=setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
 async function getJSON(url){
-  const r = await fetch(url);
-  const t = await r.text();
-  try { return JSON.parse(t); } catch(e){ console.error("Bad JSON:", t); throw e; }
+  // Robust fetch: timeout + graceful fallback
+  const ctrl = new AbortController();
+  const timer = setTimeout(()=>ctrl.abort(), 8000);
+  try{
+    const r = await fetch(url, {signal: ctrl.signal});
+    clearTimeout(timer);
+    const t = await r.text();
+    try { return JSON.parse(t); } catch(e){ console.error("Bad JSON:", t); throw e; }
+  }catch(e){
+    clearTimeout(timer);
+    console.warn('Fetch failed for', url, e.message);
+    toast('Network/API issue — showing empty data', 'error');
+    return [];
+  }
 }
 async function postJSON(body){
-  const r = await fetch(API, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-  const t = await r.text();
-  try { return JSON.parse(t); } catch(e){ console.error("Bad JSON:", t); throw e; }
+  try{
+    const r = await fetch(API, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const t = await r.text();
+    try { return JSON.parse(t); } catch(e){ console.error("Bad JSON:", t); throw e; }
+  }catch(e){ toast('POST failed: '+e.message,'error'); return {error:String(e)} }
 }
 
 /* -- Router -- */
@@ -292,7 +317,7 @@ function show(view){
 
 /* -- Dependent yarn list -- */
 async function filterYarnsFor(partySelectId, yarnSelectId){
-  const party = $(partySelectId).value; if(!party) return;
+  const party = $(partySelectId).value; if(!party){ $(yarnSelectId).value=''; return; }
   const rows = await getJSON(`${API}?action=ledger&party=${encodeURIComponent(party)}`);
   const set = [...new Set(rows.map(r=>r.yarn))].filter(Boolean).sort();
   $(yarnSelectId).innerHTML = `<option value="">All</option>` + set.map(y=>`<option>${y}</option>`).join("");
@@ -325,10 +350,11 @@ async function refreshHome(){
 
   let inc=0, out=0, ret=0, adj=0;
   rows.forEach(r=>{
-    if(r.type==='Incoming') inc += r.qty;
-    else if(r.type==='Outgoing') out += Math.abs(r.qty);
-    else if(r.type==='Return') ret += r.qty;
-    else if(r.type==='Adjust') adj += r.qty;
+    const q=Number(r.qty)||0;
+    if(r.type==='Incoming') inc += q;
+    else if(r.type==='Outgoing') out += Math.abs(q);
+    else if(r.type==='Return') ret += q;
+    else if(r.type==='Adjust') adj += q;
   });
 
   $("kIn").textContent = fmt(inc);
@@ -341,8 +367,8 @@ async function refreshHome(){
       <td>${dmy(r.date)}</td>
       <td>${r.party||""}</td>
       <td>${r.yarn||""}</td>
-      <td class="${r.qty>=0?'pos':'neg'}">${fmt(r.qty)}</td>
-      <td>${r.type}</td>
+      <td class="${(Number(r.qty)||0)>=0?'pos':'neg'}">${fmt(r.qty)}</td>
+      <td>${r.type||''}</td>
     </tr>`).join("");
 }
 
@@ -357,12 +383,12 @@ async function showStock(){
 
   const m = {};
   rows.forEach(r=>{
-    const y = r.yarn || "—";
+    const y = r.yarn || "—"; const q=Number(r.qty)||0;
     m[y] ??= {in:0,out:0,ret:0,adj:0};
-    if(r.type==='Incoming') m[y].in += r.qty;
-    else if(r.type==='Outgoing') m[y].out += Math.abs(r.qty);
-    else if(r.type==='Return') m[y].ret += r.qty;
-    else if(r.type==='Adjust') m[y].adj += r.qty;
+    if(r.type==='Incoming') m[y].in += q;
+    else if(r.type==='Outgoing') m[y].out += Math.abs(q);
+    else if(r.type==='Return') m[y].ret += q;
+    else if(r.type==='Adjust') m[y].adj += q;
   });
 
   $("stockTable").querySelector("tbody").innerHTML = Object.keys(m).sort().map(y=>{
@@ -392,8 +418,8 @@ async function loadLedger(){
       <td>${dmy(r.date)}</td>
       <td>${r.party||""}</td>
       <td>${r.yarn||""}</td>
-      <td class="${r.qty>=0?'pos':'neg'}">${fmt(r.qty)}</td>
-      <td>${r.type}</td>
+      <td class="${(Number(r.qty)||0)>=0?'pos':'neg'}">${fmt(r.qty)}</td>
+      <td>${r.type||''}</td>
     </tr>`).join("");
 }
 
@@ -402,8 +428,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // Theme
   $("themeBtn").onclick = () => document.body.classList.toggle("light");
 
-  // Router
+  // Router (ensure JS continues even if API fails)
   document.querySelectorAll(".tab[data-view]").forEach(t => t.onclick = () => show(t.dataset.view));
+  show('home');
 
   // Modal
   const openModal = ()=>{ $("modal").classList.add("open"); $("adjDate").valueAsDate = new Date(); };
@@ -444,8 +471,15 @@ document.addEventListener("DOMContentLoaded", () => {
     else alert("Backend error: "+JSON.stringify(res));
   };
 
-  // Bootstrap
+  // Bootstrap (safe)
   loadMasters();
+
+  // ---- Inline tests (won't block UI) ----
+  setTimeout(()=>{
+    console.assert(document.querySelectorAll('.tab[data-view]').length>=3, 'Tabs present');
+    console.assert(document.getElementById('view-home'), 'Home view exists');
+    console.assert(typeof show==='function', 'Router exists');
+  }, 0);
 });
 </script>
 </body>
